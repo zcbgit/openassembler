@@ -67,7 +67,7 @@ class mainFunctions(oas_gateway,attributeEditor):
 	def varCategory(self,vartype):
 		return self.oas_variableCategory(mode="", variabletype=vartype)
 
-	def add_newAttribute(self,ID,type=""):
+	def add_newAttribute(self, ID, type=0):
 		name=self.oas_ID2name(ID=ID)
 		if name==0:
 			return
@@ -79,26 +79,32 @@ class mainFunctions(oas_gateway,attributeEditor):
 			return
 		for item in self.oas_scene.items():
 			if item.backID()==ID:
-				ret=self.oas_addInput(mode="normal",node=name,variablename=str(ret_name[0]),variabletype=str(ret_type[0]),defaultvalue="")
-				if ret!=0:
-					item.addInput(str(ret_name[0]),str(ret_type[0]))
+				if type == 0:
+					if self.oas_addInput(mode="normal", node=name, variablename=str(ret_name[0]),
+										variabletype=str(ret_type[0]), defaultvalue=""):
+						item.addInOutput(str(ret_name[0]),str(ret_type[0]))
+				elif type == 1:
+					if self.oas_addOutput(mode="normal", node=name, variablename=str(ret_name[0]),
+										variabletype=str(ret_type[0]), defaultvalue=""):
+						item.addInOutput(str(ret_name[0]), str(ret_type[0]))
 
 		try:
 			self.attributeE(self.inAE["ID"])
 		except:
 			pass
 
-	def remove_Attribute(self,ID,attribute):
-		name=self.oas_ID2name(ID=ID)
-		if name==0:
-			return		
-		ret=self.oas_delInput(mode="normal",node=name,variablename=attribute)
-		if ret==0:
+	def remove_Attribute(self, ID, attribute):
+		name = self.oas_ID2name(ID=ID)
+		if name == 0:
 			return
-		self.connectionCollector.removeConnection(ID,attribute)
+		self.connectionCollector.removeConnection(ID, attribute)
 		for item in self.oas_scene.items():
-			if item.backID()==ID:
-				item.removeInput(attribute)
+			if item.backID() == ID:
+				if attribute in item.Input:
+					self.oas_delInput(mode="normal", node=name, variablename=attribute)
+				elif attribute in item.Output:
+					self.oas_delOutput(mode="normal", node=name, variablename=attribute)
+				item.removeInOutput(attribute)
 
 		try:
 			self.attributeE(self.inAE["ID"])

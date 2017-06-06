@@ -24,22 +24,25 @@ from Gui.Functions.assistantFunctions import assistantFunctions
 from Gui.Functions.mainFunctions import mainFunctions
 from Gui.Menu_Shortcut.mainMenu import mainmenu
 from Gui.Timeline.timelineMain import timelineMain
-import  Gui.Console.guiConsole as GuiCo
+import Gui.Console.guiConsole as GuiCo
 from Core.Dbase.Dbase_init import dBase_Init
 
 import sys
 
+
 class OASWindow(QtGui.QMainWindow, Ui_oasWindow):
-    def __init__(self, parent=None, f=QtCore.Qt.WindowFlags()):
-        QtGui.QMainWindow.__init__(self, parent, f)
-        Ui_oasWindow.setupUi(self,self)
+	def __init__(self, parent=None, f=QtCore.Qt.WindowFlags()):
+		QtGui.QMainWindow.__init__(self, parent, f)
+		Ui_oasWindow.setupUi(self, self)
+
 
 class GUI_main(OASWindow,keyHandler,assistantFunctions,mainFunctions,dBase_Init,timelineMain):
+
 	def __init__(self,args):
 		OASWindow.__init__(self)
 		self.last_point=QtCore.QPointF(0,0)
 		self.dBase_builder()
-		self.oas_splitter.setSizes([1,0])
+		self.oas_splitter.setSizes([3,1])
 		self.oas_splitter02.setSizes([0,1,0])
 		self.oas_splitter03.setSizes([200,70])
 

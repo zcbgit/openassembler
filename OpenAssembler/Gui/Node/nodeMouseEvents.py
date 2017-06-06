@@ -16,9 +16,11 @@ class nodeMouseEvents():
 		ax=event.pos().x()
 		ay=event.pos().y()
 		if event.button()==1:
-			if (2<ax<16):
-				if (self.sizey-40)<ay<(self.sizey-24):
-					self.add_newAttribute(self.ID)
+			if (self.sizey - 40) < ay < (self.sizey - 24):
+				if 2 < ax < 16:
+					self.add_newAttribute(self.ID, 0)
+				elif 182 < ax < 198:
+					self.add_newAttribute(self.ID, 1)
 
 		if event.button()==2:
 			result=""

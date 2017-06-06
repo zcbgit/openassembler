@@ -147,6 +147,7 @@ class nodePainter():
 		painter.setBrush(QtGui.QBrush(orangecolor))
 
 		painter.drawEllipse(2,self.sizey-40,16,16)
+		painter.drawEllipse(182, self.sizey - 40, 16, 16)
 
 		font.setBold(True)
 		painter.setFont(font)
@@ -154,4 +155,5 @@ class nodePainter():
 		pen.setWidth(2)
 		painter.setPen(pen)
 
-		painter.drawText(2,self.sizey-40,16,16,0x0084,"+")
+		painter.drawText(2, self.sizey - 40, 16, 16, 0x0084, "+")
+		painter.drawText(182, self.sizey - 40, 16, 16, 0x0084, "+")

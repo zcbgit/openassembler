@@ -82,10 +82,18 @@ class oas_gateway(oas_data_handler,oas_fileio,oas_execute):
 		return self.oas_data_frame(mode=mode,frame=frame)
 
 	def oas_addInput(self,mode="normal",node="",variablename="",variabletype="string",defaultvalue=""):
-		return self.oas_data_addInput(mode=mode,node=node,variablename=variablename,variabletype=variabletype,defaultvalue=defaultvalue)
+		return self.oas_data_addInput(mode=mode,node=node,variablename=variablename,variabletype=variabletype,
+									  defaultvalue=defaultvalue)
 
 	def oas_delInput(self,mode="normal",node="",variablename=""):
 		return self.oas_data_delInput(mode=mode,node=node,variablename=variablename)
+
+	def oas_addOutput(self, mode="normal", node="", variablename="", variabletype="string", defaultvalue=""):
+		return self.oas_data_addOutput(mode=mode, node=node, variablename=variablename, variabletype=variabletype,
+									  defaultvalue=defaultvalue)
+
+	def oas_delOutput(self, mode="normal", node="", variablename=""):
+		return self.oas_data_delOutput(mode=mode, node=node, variablename=variablename)
 
 	def oas_menucats(self,mode="normal"):
 		return self.oas_menucategories

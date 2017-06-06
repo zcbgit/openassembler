@@ -18,21 +18,16 @@ class DrawNode(QtGui.QGraphicsItem,nodeFunctions,nodeMouseEvents,nodePainter):
 	def __init__(self,ID,NodeUpperLabel,Input,Output,collectedFunctions):
 		QtGui.QGraphicsItem.__init__(self)
 		sizex=200
-		iz=[]
-		for key in Input.keys():
-			iz.append(key)
-		oz=[]
-		for key in Output.keys():
-			oz.append(key)
-		if len(iz)>len(oz):
-			sizey=len(iz)*40+60
-		elif len(iz)<len(oz):
-			sizey=len(oz)*40+60
+		num_in, num_out = len(Input), len(Output)
+		if num_in > num_out:
+			sizey = num_in*40+60
+		elif num_in < num_out:
+			sizey = num_out*40+60
 		else:
-			sizey=len(oz)*40+60
-		if sizey<100:
-			sizey=100
-		sizey+=20
+			sizey = num_out*40+60
+		if sizey < 100:
+			sizey = 100
+		sizey += 20
 		self.sizex=sizex
 		self.sizey=sizey
 		self.setZValue(1)

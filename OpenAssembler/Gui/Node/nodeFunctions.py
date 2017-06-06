@@ -12,13 +12,13 @@
 from PyQt4 import QtCore, QtGui
 
 class nodeFunctions():
-	def addInput(self,attributeName,variabletype):
+	def addInOutput(self,attributeName,variabletype):
 		# it is connected to the main dbase, so it automatically get the new
 		#self.Input[attributeName]={"variable_type":variabletype,"options":"","value":""}
 		self.recalculateSize()
 		self.update()
 
-	def removeInput(self,attributeName):
+	def removeInOutput(self,attributeName):
 		# it is connected to the main dbase, so it automatically deleted
 		self.recalculateSize()
 		self.update()

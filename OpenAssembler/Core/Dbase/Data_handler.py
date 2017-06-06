@@ -366,74 +366,89 @@ class oas_data_handler(oas_variablechecker):
 # ##########################################################################################			
 				
 	def oas_data_addInput(self,mode="normal",node="",variablename="",variabletype="string",defaultvalue=""):
-		if node!="" and variablename!="":
-			ref_string="qwertyuiopasdfghjklzxcvbnm1234567890_QWERTYUIOPASDFGHJKLZXCVBNM"
-			numb="1234567890"
-			result_new_name=""
+		return self.oas_data_addInOutput("inputs", mode, node, variablename, variabletype, defaultvalue)
+
+	def oas_data_addOutput(self, mode="normal", node="", variablename="", variabletype="string", defaultvalue=""):
+		return self.oas_data_addInOutput("outputs", mode, node, variablename, variabletype, defaultvalue)
+
+	def oas_data_addInOutput(self, type="inputs", mode="normal", node="", variablename="", variabletype="string", defaultvalue=""):
+		if node != "" and variablename != "":
+			ref_string = "qwertyuiopasdfghjklzxcvbnm1234567890_QWERTYUIOPASDFGHJKLZXCVBNM"
+			numb = "1234567890"
+			result_new_name = ""
 			for char in str(variablename):
-				if ref_string.find(char)>-1:
-					result_new_name+=char
-			variablename=result_new_name
-			ID=""
+				if ref_string.find(char) > -1:
+					result_new_name += char
+			variablename = result_new_name
+			ID = ""
 			for id in self.oas_rt.keys():
-				if str(self.oas_rt[id]["name"])==str(node):
-					ID=id
-			if ID=="":
-				if mode=="normal":
-					print "[Error] In addInput: Node not existing..."
+				if str(self.oas_rt[id]["name"]) == str(node):
+					ID = id
+			if ID == "":
+				if mode == "normal":
+					print "[Error] In add%s: Node not existing..." % "Input" if type == "inputs" else "Output"
 				return 0
-			if self.oas_rt[ID]["inputs"].has_key(str(variablename)):
-				if mode=="normal":
-					print "[Error] In addInput: Attribute already exsisting."
+			if str(variablename) in self.oas_rt[ID][type]:
+				if mode == "normal":
+					print "[Error] In add%s: Attribute already exsisting." % "Input" if type == "inputs" else "Output"
 				return 0
-			self.oas_rt[ID]["inputs"][variablename]={'variable_type':variabletype,'value':defaultvalue,'options':''}
-			if mode=="normal":
-				print "Attribute "+str(variablename)+" was added to node "+str(node)+" !"
+			self.oas_rt[ID][type][variablename] = {'variable_type': variabletype, 'value': defaultvalue,
+													   'options': ''}
+			if mode == "normal":
+				print "Attribute " + str(variablename) + " was added to node " + str(node) + " !"
 			return variablename
 		else:
-			if mode=="normal":
-				print "[Error] In addInput: Problematic description.."
+			if mode == "normal":
+				print "[Error] In add%s: Problematic description.." % "Input" if type == "inputs" else "Output"
 			return 0
 
-	def oas_data_delInput(self,mode="normal",node="",variablename=""):
-		if node!="" and variablename!="":
-			ID=""
+	def oas_data_delInput(self,mode="normal",node="", variablename=""):
+		return self.oas_data_delInOutput("inputs", mode, node, variablename)
+
+	def oas_data_delOutput(self,mode="normal",node="", variablename=""):
+		return self.oas_data_delInOutput("outputs", mode, node, variablename)
+
+	def oas_data_delInOutput(self, type="inputs", mode="normal", node="", variablename=""):
+		if node != "" and variablename != "":
+			ID = ""
 			for id in self.oas_rt.keys():
-				if str(self.oas_rt[id]["name"])==str(node):
-					ID=id
-			if ID=="":
-				if mode=="normal":
-					print "[Error] In delInput: Node not existing..."
+				if str(self.oas_rt[id]["name"]) == str(node):
+					ID = id
+			if ID == "":
+				if mode == "normal":
+					print "[Error] In del%s: Node not existing..." % "Input" if type == "inputs" else "Output"
 				return 0
-			if self.oas_rt[ID]["inputs"].has_key(str(variablename)):
+			if str(variablename) in self.oas_rt[ID][type]:
 				pass
 			else:
-				if mode=="normal":
-					print "[Error] In delInput: Attribute not existing."
+				if mode == "normal":
+					print "[Error] In del%s: Attribute not existing." % "Input" if type == "inputs" else "Output"
 				return 0
-			nodetype=self.oas_rt[ID]["nodetype"]
-			if self.oas_node_list[nodetype]["inputs"].has_key(variablename):
-				if mode=="normal":
-					print "[Error] In delInput: This is an original attribute for the node, you can not delete it!"
+			nodetype = self.oas_rt[ID]["nodetype"]
+			if variablename in self.oas_node_list[nodetype][type]:
+				if mode == "normal":
+					print "[Error] In del%s: This is an original attribute for the node, you can not delete it!" % "Input" if type == "inputs" else "Output"
 				return 0
-			contodelete=""
+			contodelete = ""
 			for cons in self.oas_rt_connections.keys():
-				if self.oas_rt[str(self.oas_rt_connections[cons]["in_node"])]["name"]==str(node):
-					if str(self.oas_rt_connections[cons]["in_value"])==str(variablename): 
-						contodelete=cons
-			if contodelete!="":
-				cdret=self.oas_data_delete(mode=mode,deletetype="connection",target=contodelete)
-				if cdret==0:
-					if mode=="normal":
-						print "[Error] In delInput: Problem during the conneciton deletion"
+				node_type = "in_node" if type == "inputs" else "out_node"
+				value_type = "in_value" if type == "inputs" else "out_value"
+				if self.oas_rt[str(self.oas_rt_connections[cons][node_type])]["name"] == str(node):
+					if str(self.oas_rt_connections[cons][value_type]) == str(variablename):
+						contodelete = cons
+			if contodelete != "":
+				cdret = self.oas_data_delete(mode=mode, deletetype="connection", target=contodelete)
+				if cdret == 0:
+					if mode == "normal":
+						print "[Error] In del%s: Problem during the conneciton deletion" % "Input" if type == "inputs" else "Output"
 					return 0
-			del self.oas_rt[ID]["inputs"][variablename]
-			if mode=="normal":
-				print "Attribute "+str(variablename)+" was deleted!"
+			del self.oas_rt[ID][type][variablename]
+			if mode == "normal":
+				print "Attribute " + str(variablename) + " was deleted!"
 			return variablename
 		else:
-			if mode=="normal":
-				print "[Error] In delInput: Problematic description.."
+			if mode == "normal":
+				print "[Error] In del%s: Problematic description.." % "Input" if type == "inputs" else "Output"
 			return 0
 
 	def oas_data_set(self,mode="normal",nodevalue="",value=""):
