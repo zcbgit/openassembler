@@ -15,7 +15,7 @@ from nodeMouseEvents import nodeMouseEvents
 from nodePainter import nodePainter
 
 class DrawNode(QtGui.QGraphicsItem,nodeFunctions,nodeMouseEvents,nodePainter):
-	def __init__(self,ID,NodeUpperLabel,Input,Output,collectedFunctions):
+	def __init__(self,ID,NodeUpperLabel,Input,Output,collectedFunctions, input_addable, output_addable):
 		QtGui.QGraphicsItem.__init__(self)
 		sizex=200
 		num_in, num_out = len(Input), len(Output)
@@ -35,6 +35,8 @@ class DrawNode(QtGui.QGraphicsItem,nodeFunctions,nodeMouseEvents,nodePainter):
 		self.nodeUpperLabel=NodeUpperLabel
 		self.Input=Input
 		self.Output=Output
+		self.input_addable = input_addable
+		self.output_addable = output_addable
 		self.outs=[]
 		self.ins=[]
 		self.connected_outs=[]

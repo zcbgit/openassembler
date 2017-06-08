@@ -53,73 +53,63 @@ class nodePainter():
 
 		painter.setBrush(QtGui.QBrush(connectioncolor))
 
-		iz=[]
-		for key in self.Input.keys():
-			iz.append(key)
+		iz = self.Input.keys()
+		oz = self.Output.keys()
 
-		oz=[]
-		for key in self.Output.keys():
-			oz.append(key)
-
-		iz.sort()
-		oz.sort()
-
-		n=1
-		while n<=len(iz):
-			if self.connected_ins.count(iz[n-1])>0:
+		for i, key in enumerate(iz):
+			if self.connected_ins.count(key) > 0:
 						pen.setColor(greencolor)
 						painter.setPen(pen)
 						painter.setBrush(QtGui.QBrush(greencolor))
-			if str(self.Input[iz[n-1]]["value"])[:1]==">" or str(self.Input[iz[n-1]]["value"])[:1]=="$":
+			if str(self.Input[key]["value"])[:1]==">" or str(self.Input[key]["value"])[:1] == "$":
 						pen.setColor(yellowcolor)
 						painter.setPen(pen)
-						painter.setBrush(QtGui.QBrush(yellowcolor))	
-			if str(self.Input[iz[n-1]]["value"])[:1]=="=":
+						painter.setBrush(QtGui.QBrush(yellowcolor))
+			if str(self.Input[key]["value"])[:1]=="=":
 						pen.setColor(bluecolor)
 						painter.setPen(pen)
-						painter.setBrush(QtGui.QBrush(bluecolor))				
-			self.ins.append([0,n*40,30,30,iz[n-1]])
-			painter.drawRoundedRect(QtCore.QRect(0,n*40,50,30),5,5)
+						painter.setBrush(QtGui.QBrush(bluecolor))
+			self.ins.append([0, (i + 1)*40, 30, 30, key])
+			painter.drawRoundedRect(QtCore.QRect(0, (i + 1)*40, 50, 30), 5, 5)
 			pen.setColor(connectioncolor)
 			painter.setPen(pen)
 			painter.setBrush(QtGui.QBrush(connectioncolor))
-			n+=1
-		n=1
-		while n<=len(oz):
-			if self.connected_outs.count(oz[n-1])>0:
+
+		for i, key in enumerate(oz):
+			if self.connected_outs.count(key)>0:
 						pen.setColor(greencolor)
 						painter.setPen(pen)
 						painter.setBrush(QtGui.QBrush(greencolor))
-			self.outs.append([self.sizex-30,n*40,30,30,oz[n-1]])
-			painter.drawRoundedRect(QtCore.QRect(self.sizex-30,n*40,30,30),5,5)
+			self.outs.append([self.sizex-30, (i + 1)*40, 30, 30, key])
+			painter.drawRoundedRect(QtCore.QRect(self.sizex-30, (i + 1)*40, 30, 30), 5, 5)
 			pen.setColor(connectioncolor)
 			painter.setPen(pen)
 			painter.setBrush(QtGui.QBrush(connectioncolor))
-			n+=1
 
 		pen.setColor(trianglecolor)
 		painter.setPen(pen)
 
 		painter.setBrush(QtGui.QBrush(trianglecolor))
 
-		n=1
-		while n<=len(iz):
-			typ=self.Input[iz[n-1]]["variable_type"]
+		for i, key in enumerate(iz):
+			typ = self.Input[key]["variable_type"]
 			icolor=self.getArrtibuteColor(typ)
 			pen.setColor(icolor)
 			painter.setPen(pen)
 			painter.setBrush(QtGui.QBrush(icolor))
-			painter.drawPolygon(QtCore.QPoint(9,n*40+7),QtCore.QPoint(9,n*40+23),QtCore.QPoint(15,n*40+15))
-			n+=1
-		n=1
-		while n<=len(oz):
-			typ=self.Output[oz[n-1]]["variable_type"]
+			painter.drawPolygon(QtCore.QPoint(9, (i + 1)*40+7),
+								QtCore.QPoint(9, (i + 1)*40+23),
+								QtCore.QPoint(15, (i + 1)*40+15))
+
+		for i, key in enumerate(oz):
+			typ = self.Output[key]["variable_type"]
 			icolor=self.getArrtibuteColor(typ)
 			pen.setColor(icolor)
 			painter.setPen(pen)
 			painter.setBrush(QtGui.QBrush(icolor))
-			painter.drawPolygon(QtCore.QPoint(self.sizex-13,n*40+7),QtCore.QPoint(self.sizex-13,n*40+23),QtCore.QPoint(self.sizex-7,n*40+15))
-			n+=1
+			painter.drawPolygon(QtCore.QPoint(self.sizex-13, (i + 1)*40+7),
+								QtCore.QPoint(self.sizex-13, (i + 1)*40+23),
+								QtCore.QPoint(self.sizex-7, (i + 1)*40+15))
 
 		pen.setColor(QtGui.QColor(0,0,0))
 		pen.setWidth(2)
@@ -128,14 +118,10 @@ class nodePainter():
 		painter.setBrush(QtGui.QBrush(fillColor))
 		painter.drawRoundedRect(QtCore.QRect(20,20,self.sizex-40,self.sizey-30),10,10)
 
-		n=1
-		while n<=len(iz):
-			painter.drawText(25,n*40,self.sizex/2,30,0x0081,iz[n-1])
-			n+=1
-		n=1
-		while n<=len(oz):
-			painter.drawText(self.sizex/2,n*40,self.sizex/2-25,30,0x0082,oz[n-1])
-			n+=1
+		for i, key in enumerate(iz):
+			painter.drawText(25, (i+1)*40, self.sizex/2, 30, 0x0081, key)
+		for i, key in enumerate(oz):
+			painter.drawText(self.sizex/2, (i+1)*40, self.sizex/2-25, 30, 0x0082, key)
 
 		trianglecolor=QtGui.QColor(210,210,210)
 		orangecolor=QtGui.QColor(160,130,44)
@@ -146,8 +132,10 @@ class nodePainter():
 
 		painter.setBrush(QtGui.QBrush(orangecolor))
 
-		painter.drawEllipse(2,self.sizey-40,16,16)
-		painter.drawEllipse(182, self.sizey - 40, 16, 16)
+		if self.input_addable:
+			painter.drawEllipse(2,self.sizey-40,16,16)
+		if self.output_addable:
+			painter.drawEllipse(182, self.sizey - 40, 16, 16)
 
 		font.setBold(True)
 		painter.setFont(font)
@@ -155,5 +143,7 @@ class nodePainter():
 		pen.setWidth(2)
 		painter.setPen(pen)
 
-		painter.drawText(2, self.sizey - 40, 16, 16, 0x0084, "+")
-		painter.drawText(182, self.sizey - 40, 16, 16, 0x0084, "+")
+		if self.input_addable:
+			painter.drawText(2, self.sizey - 40, 16, 16, 0x0084, "+")
+		if self.output_addable:
+			painter.drawText(182, self.sizey - 40, 16, 16, 0x0084, "+")

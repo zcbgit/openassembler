@@ -16,7 +16,7 @@ try:
 except:
 	pass
 
-from Gui.OAS_Window.oas_main04 import Ui_oasWindow
+from Gui.OAS_Window.oas_main import Ui_oasWindow
 import Gui.Connection.drawConnection as DC
 import Gui.Connection.inConnection as IC
 from Gui.Menu_Shortcut.keyHandler import keyHandler
@@ -40,7 +40,7 @@ class GUI_main(OASWindow,keyHandler,assistantFunctions,mainFunctions,dBase_Init,
 
 	def __init__(self,args):
 		OASWindow.__init__(self)
-		self.last_point=QtCore.QPointF(0,0)
+		self.last_point=QtCore.QPointF(3,1)
 		self.dBase_builder()
 		self.oas_splitter.setSizes([3,1])
 		self.oas_splitter02.setSizes([0,1,0])
@@ -48,8 +48,8 @@ class GUI_main(OASWindow,keyHandler,assistantFunctions,mainFunctions,dBase_Init,
 
 		self.inAE={}
 
-		sys.stdout = GuiCo.guiConsole( self.consoleOutArea, sys.stdout)
-		sys.stderr = GuiCo.guiConsole( self.consoleOutArea, sys.stderr, QtGui.QColor(255,0,0) )
+		sys.stdout = GuiCo.guiConsole(self.consoleOutArea, sys.stdout)
+		sys.stderr = GuiCo.guiConsole(self.consoleOutArea, sys.stderr, QtGui.QColor(255, 0, 0))
 
 		self.consoleInArea.hide()
 
@@ -115,7 +115,7 @@ class GUI_main(OASWindow,keyHandler,assistantFunctions,mainFunctions,dBase_Init,
 
 		self.timeline_start()
 
-		QtCore.QObject.connect(self.oas_nodeName, QtCore.SIGNAL("returnPressed()"),self.rename)
+		QtCore.QObject.connect(self.oas_nodeName, QtCore.SIGNAL("editingFinished()"),self.rename)
 
 		QtCore.QObject.connect(self.oas_new_bu, QtCore.SIGNAL("clicked()"),self.new_file)
 		QtCore.QObject.connect(self.oas_open_bu, QtCore.SIGNAL("clicked()"),self.open_file)

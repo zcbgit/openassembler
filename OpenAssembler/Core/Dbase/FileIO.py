@@ -56,7 +56,10 @@ class oas_fileio(oas_data_handler):
 						result+="node "+str(self.oas_rt[nds]['nodetype'])+"\n{\n"
 						result+="\tname "+str(self.oas_rt[nds]['name'])+"\n\n"
 						for inps in self.oas_rt[nds]['inputs'].keys():
-							result+="\tinput\t"+str(self.oas_rt[nds]['inputs'][str(inps)]['variable_type'])+"\t"+str(inps)+" \""+str(self.oas_rt[nds]['inputs'][str(inps)]['value'])+"\"\n"
+							value = str(self.oas_rt[nds]['inputs'][str(inps)]['value'])
+							if '"' in value:
+								value = value.replace("\"", "\'")
+							result+="\tinput\t"+str(self.oas_rt[nds]['inputs'][str(inps)]['variable_type'])+"\t"+str(inps)+" \""+value+"\"\n"
 						result+="\n"
 						for outps in self.oas_rt[nds]['outputs'].keys():
 							result+="\toutput\t"+str(self.oas_rt[nds]['outputs'][str(outps)]['variable_type'])+"\t"+str(outps)+"\n"

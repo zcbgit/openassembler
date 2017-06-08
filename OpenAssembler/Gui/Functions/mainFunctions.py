@@ -141,7 +141,9 @@ class mainFunctions(oas_gateway,attributeEditor):
 			return 0
 		ins=self.oas_nodeInputs(mode="normal",ID=ID)
 		outs=self.oas_nodeOutputs(mode="normal",ID=ID)
-		item = DN.DrawNode( ID,name,ins,outs,self.nodeDraw_inputs_collection)
+		input_addable = self.oas_input_addable(mode="normal",ID=ID)
+		output_addable = self.oas_output_addable(mode="normal",ID=ID)
+		item = DN.DrawNode( ID,name,ins,outs,self.nodeDraw_inputs_collection, input_addable, output_addable)
 		item.setPos(self.last_point)
 		self.oas_positions(mode="normal",nodevalue=name,posx=self.last_point.x(),posy=self.last_point.y())
 		self.oas_scene.addItem(item)
@@ -154,7 +156,9 @@ class mainFunctions(oas_gateway,attributeEditor):
 			return 0
 		ins=self.oas_nodeInputs(mode="normal",ID=ID)
 		outs=self.oas_nodeOutputs(mode="normal",ID=ID)
-		item = DN.DrawNode( ID,name,ins,outs,self.nodeDraw_inputs_collection)
+		input_addable = self.oas_input_addable(mode="normal",ID=ID)
+		output_addable = self.oas_output_addable(mode="normal",ID=ID)
+		item = DN.DrawNode( ID,name,ins,outs,self.nodeDraw_inputs_collection, input_addable, output_addable)
 		item.setPos(self.last_point)
 		self.oas_positions(mode="normal",nodevalue=name,posx=self.last_point.x(),posy=self.last_point.y())
 		self.oas_scene.addItem(item)
@@ -230,7 +234,6 @@ class mainFunctions(oas_gateway,attributeEditor):
 		
 	def save_file(self):
 		currentfile=self.oas_currentFileName()
-		currentfile
 		if currentfile=="" or currentfile==0:
 			currentfile = QtGui.QFileDialog.getSaveFileName(self, 'Save OpenAssebler Network!','untitled.oas')	
 			if currentfile=="":
@@ -296,9 +299,11 @@ class mainFunctions(oas_gateway,attributeEditor):
 			ins=self.oas_nodeInputs(mode="normal",ID=ID)
 			outs=self.oas_nodeOutputs(mode="normal",ID=ID)
 			pos=self.oas_getPositions(mode="normal",node=name)
+			input_addable = self.oas_input_addable(mode="normal",ID=ID)
+			output_addable = self.oas_output_addable(mode="normal",ID=ID)
 			if pos==0:
 				pos=[-2000,-2000]
-			item = DN.DrawNode( ID,name,ins,outs,self.nodeDraw_inputs_collection)
+			item = DN.DrawNode( ID,name,ins,outs,self.nodeDraw_inputs_collection, input_addable, output_addable)
 			item.setPos(QtCore.QPointF(pos[0],pos[1]))
 			self.oas_scene.addItem(item)
 		scene_connections=self.oas_list(mode="normal",listtype="connections",searchtag="")
@@ -343,9 +348,11 @@ class mainFunctions(oas_gateway,attributeEditor):
 			ins=self.oas_nodeInputs(mode="normal",ID=ID)
 			outs=self.oas_nodeOutputs(mode="normal",ID=ID)
 			pos=self.oas_getPositions(mode="normal",node=name)
+			input_addable = self.oas_input_addable(mode="normal",ID=ID)
+			output_addable = self.oas_output_addable(mode="normal",ID=ID)
 			if pos==0:
 				pos=[-2000,-2000]
-			item = DN.DrawNode( ID,name,ins,outs,self.nodeDraw_inputs_collection)
+			item = DN.DrawNode( ID,name,ins,outs,self.nodeDraw_inputs_collection, input_addable, output_addable)
 			item.setPos(QtCore.QPointF(pos[0],pos[1]))
 			self.oas_scene.addItem(item)
 		scene_connections=self.oas_list(mode="normal",listtype="connections",searchtag="")

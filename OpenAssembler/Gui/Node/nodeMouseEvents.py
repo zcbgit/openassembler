@@ -17,9 +17,9 @@ class nodeMouseEvents():
 		ay=event.pos().y()
 		if event.button()==1:
 			if (self.sizey - 40) < ay < (self.sizey - 24):
-				if 2 < ax < 16:
+				if 2 < ax < 16 and self.input_addable:
 					self.add_newAttribute(self.ID, 0)
-				elif 182 < ax < 198:
+				elif 182 < ax < 198 and self.output_addable:
 					self.add_newAttribute(self.ID, 1)
 
 		if event.button()==2:
@@ -45,8 +45,6 @@ class nodeMouseEvents():
 				mainmenu.addAction("Delete",lambda id=self.ID:self.do_oas_del_sel(id))
 				mainmenu.addSeparator()
 				mainmenu.addAction("Duplicate",lambda id=self.ID:self.do_oas_duplicate(id))
-				mainmenu.addSeparator()
-				mainmenu.addAction("Set as End-Node",lambda id=self.ID:self.do_oas_endnode(id))
 				mainmenu.exec_(QtCore.QPoint(eventpos.x(),eventpos.y()))
 				return
 		self.setZValue(3)

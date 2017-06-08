@@ -124,3 +124,9 @@ class oas_gateway(oas_data_handler,oas_fileio,oas_execute):
 
 	def oas_nodeType(self,mode="normal",node=""):
 		return self.oas_rt[self.oas_name2ID(name=node)]["nodetype"]
+
+	def oas_input_addable(self, mode="normal", ID=""):
+		return self.oas_rt[ID]["input_addable"]
+
+	def oas_output_addable(self, mode="normal", ID=""):
+		return self.oas_rt[ID]["output_addable"]

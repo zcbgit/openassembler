@@ -278,6 +278,7 @@ class oas_data_handler(oas_variablechecker):
 				self.oas_rt["Node"+generated_random]['posy']=posy
 				del self.oas_rt["Node"+generated_random]['tag']
 				del self.oas_rt["Node"+generated_random]['path']
+				del self.oas_rt["Node" + generated_random]['gen_func']
 				self.oas_last_node_created=str(str(nds)+generated_random)
 				if mode=="normal":
 					print "Node "+str(str(nds)+generated_random)+" created."
@@ -527,6 +528,8 @@ class oas_data_handler(oas_variablechecker):
 	
 	def oas_data_rename(self,mode="normal",old="",new=""):
 			if old!="" and new!="":
+				if old == new:
+					return [str(new)]
 				ref_string="qwertyuiopasdfghjklzxcvbnm1234567890_QWERTYUIOPASDFGHJKLZXCVBNM"
 				numb="1234567890"
 				result_new_name=""

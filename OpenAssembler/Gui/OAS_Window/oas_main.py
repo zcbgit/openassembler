@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'oas_main04.ui'
+# Form implementation generated from reading ui file 'oas_main.ui'
 #
 # Created: Wed Jul 15 10:23:49 2009
 #      by: PyQt4 UI code generator 4.4.4

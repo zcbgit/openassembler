@@ -14,6 +14,7 @@
 # #####################################################################################################################################
 
 import os, sys
+import collections
 import imp
 from Core.Dbase.variables import oas_variablechecker
 
@@ -41,35 +42,37 @@ class oas_setup(oas_variablechecker):
 					setup_parsed.append(ret)
 		return setup_parsed
 
-	def oas_menucategory_settings(self, parsed):
+	def oas_menucategory_settings(self, parsed, nodelist):
 		mncline = {}
-		for liness in parsed:
-			if liness[0] == "menucategory":
-				mncline[liness[1]] = []
-				for i in range(2, len(liness)):
-					for nd in self.oas_node_list.keys():
-						if self.oas_node_list[nd]['tag'] == str(liness[i]):
-							mncline[liness[1]].append(str(nd))
-		mncline["OpenAssembler Core"] = ["_def"]
+		for lines in parsed:
+			if lines[0] == "menucategory":
+				mncline[lines[1]] = []
+				for i in range(2, len(lines)):
+					for name, node in nodelist.iteritems():
+						if node.tag == str(lines[i]):
+							mncline[lines[1]].append(name)
 		return mncline
 
 	# #####################################################################################################################################
 	# to collect the variabletypes settings (for the connection check procedure)
 	# #####################################################################################################################################
 
-	def oas_register_variable_with_cat(self, setupfilecontent, variablecategory, var):
-		cat = "undefined"
-		for i in range(0, len(setupfilecontent)):
-			if setupfilecontent[i][0] == "variablecategory":
-				if setupfilecontent[i][2].find(str(var)) > -1:
-					cat = str(setupfilecontent[i][1])
-		variablecategory[str(var)] = cat
+	def oas_register_variable_with_cat(self, variablecategory, nodelist):
+		for node in nodelist.itervalues():
+			for pin in node.input_pin.itervalues():
+				variable_type = pin.variable_type
+				if variable_type not in variablecategory:
+					variablecategory[variable_type] = "undefined"
+			for pin in node.output_pin.itervalues():
+				variable_type = pin.variable_type
+				if variable_type not in variablecategory:
+					variablecategory[variable_type] = "undefined"
 
 	def manuPath(self, setupfilecontent):
 		folders = []
+		cur_dir = os.getcwd()
 		for i in range(0, len(setupfilecontent)):
 			if setupfilecontent[i][0] == "manualpath":
-				cur_dir = os.getcwd()
 				for it in setupfilecontent[i][1].split(","):
 					folders.append(os.path.join(cur_dir, it))
 		return folders
@@ -89,36 +92,8 @@ class oas_setup(oas_variablechecker):
 					if ext != ".py" or name == "__init__":
 						continue
 					module = imp.load_source(name, path)
-					inputs = {}
-					outputs = {}
-					entry_name = module.DEFINE["name"]
-					entry_tag = module.DEFINE["tag"]
-					for in_key, in_value in module.DEFINE["input"].iteritems():
-						variable_type, default, options = in_value
-						self.oas_register_variable_with_cat(self.setup_contents, self.oas_variablecategory,
-															variable_type)
-						default = self.oas_variable(variable_type, default)
-						inputs[in_key] = {'variable_type': variable_type, 'value': str(default), 'options': options}
-					for out_key, out_value in module.DEFINE["output"].iteritems():
-						variable_type, default, options = out_value
-						self.oas_register_variable_with_cat(self.setup_contents, self.oas_variablecategory,
-															variable_type)
-						default = self.oas_variable(variable_type, default)
-						outputs[out_key] = {'variable_type': variable_type, 'value': str(default), 'options': options}
+					node = getattr(module, "C%s" % name.capitalize())
+					node.setup()
+					nodelist[node.node_type] = node
 
-						settings = {"_do_cache": "False"}
-						nodelist[entry_name] = {
-							'tag': entry_tag,
-							'path': path,
-							'inputs': inputs,
-							'outputs': outputs,
-							"settings": settings
-						}
-
-		settings_def = {"_do_cache": "False", "QtMainWindowUi": ""}
-		nodelist["_def"] = {'tag': str("oascore"), 'path': str("OpenAssembler internal function"),
-							'inputs': {"Input": {'variable_type': "any", 'value': "", 'options': ""},
-									   "Hython": {'variable_type': "int", 'value': "0", 'options': ""},
-									   "Nuke": {'variable_type': "int", 'value': "0", 'options': ""}}, 'outputs': {},
-							"settings": settings_def}
 		return nodelist

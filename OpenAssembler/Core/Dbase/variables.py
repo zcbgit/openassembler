@@ -7,9 +7,11 @@
 #
 # #####################################################################################
 
+
 class oas_variablechecker:
 
-	def oas_variable(self,variabletype,value):
+	@staticmethod
+	def oas_variable(variabletype, value):
 		if len(value)==0:
 			return value
 		if str(value)[0]=="=" or str(value)[0]=="$":

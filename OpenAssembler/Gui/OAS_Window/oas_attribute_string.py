@@ -13,16 +13,15 @@ import os,sys
 class Ui_oas_attribute_widget(object):
     def setupUi(self, oas_attribute_widget,name,value,status,variabletype,nodeSet):
 
-	self.nodeSet=nodeSet	
-	pathname = os.path.dirname(sys.argv[0])
-	fullpath=os.path.abspath(pathname)	
+        self.nodeSet = nodeSet
+        self.name = name
+        pathname = os.path.dirname(sys.argv[0])
+        fullpath=os.path.abspath(pathname)
 
-	if os.name=="nt":
-		iconPath=fullpath+"/Icons"
-	elif os.name=="posix":
-		iconPath=fullpath+"/Icons"
-	self.name=name
-
+        if os.name == "nt":
+            iconPath = fullpath+"/Icons"
+        elif os.name == "posix":
+            iconPath=fullpath+"/Icons"
 
         oas_attribute_widget.setObjectName("oas_attribute_widget")
         oas_attribute_widget.resize(400, 40)
@@ -49,11 +48,11 @@ class Ui_oas_attribute_widget(object):
         self.oas_widget_led.setMaximumSize(QtCore.QSize(16, 16))
         icon = QtGui.QIcon()
 
-	self.oas_widget_led.setToolTip(str(variabletype))
-	if status=="connected":
-		icon.addPixmap(QtGui.QPixmap(iconPath+"/green-on-32.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-	else:
-		icon.addPixmap(QtGui.QPixmap(iconPath+"/white-off-32.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.oas_widget_led.setToolTip(str(variabletype))
+        if status=="connected":
+            icon.addPixmap(QtGui.QPixmap(iconPath+"/green-on-32.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        else:
+            icon.addPixmap(QtGui.QPixmap(iconPath+"/white-off-32.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
 
         self.oas_widget_led.setIcon(icon)
         self.oas_widget_led.setAutoRaise(True)
@@ -78,13 +77,13 @@ class Ui_oas_attribute_widget(object):
         self.oas_widget_editor.setObjectName("oas_widget_editor")
         self.oas_widget_main_layout.addWidget(self.oas_widget_editor)
         self.gridLayout.addLayout(self.oas_widget_main_layout, 0, 0, 1, 1)
-	self.oas_widget_editor.setText(str(value))
-	if status=="connected":
-		self.oas_widget_editor.setReadOnly(True)
+        self.oas_widget_editor.setText(str(value))
+        if status == "connected":
+            self.oas_widget_editor.setReadOnly(True)
 
         self.retranslateUi(oas_attribute_widget)
         QtCore.QMetaObject.connectSlotsByName(oas_attribute_widget)
-	QtCore.QObject.connect(self.oas_widget_editor, QtCore.SIGNAL("returnPressed()"),lambda entr=self.oas_widget_editor,nodeSet=nodeSet,name=self.name :setValue(nodeSet,entr,name))
+        QtCore.QObject.connect(self.oas_widget_editor, QtCore.SIGNAL("returnPressed()"),lambda entr=self.oas_widget_editor,nodeSet=nodeSet,name=self.name :setValue(nodeSet,entr,name))
 
     def retranslateUi(self, oas_attribute_widget):
         oas_attribute_widget.setWindowTitle(QtGui.QApplication.translate("oas_attribute_widget", "Form", None, QtGui.QApplication.UnicodeUTF8))
@@ -93,8 +92,8 @@ class Ui_oas_attribute_widget(object):
         self.oas_name_w_label.setText(QtGui.QApplication.translate("oas_attribute_widget", self.name, None, QtGui.QApplication.UnicodeUTF8))
 
 def setValue(nodeSet,entr,name):
-	val=str(entr.text())
-	nodeSet(name,val)
+    val=str(entr.text())
+    nodeSet(name,val)
 
 if __name__ == "__main__":
     import sys
