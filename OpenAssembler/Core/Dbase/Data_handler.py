@@ -1,118 +1,97 @@
-# #####################################################################################
-#
-#  OpenAssembler V3
-#  Owner: Laszlo Mates
-#  Email: laszlo.mates@gmail.com
-#  Date: 2009.06.08
-#
-# #####################################################################################
+# $Id$
+# -*- coding: utf-8 -*-
 
-import os
-import sys
 from random import *
-from copy import deepcopy
+from basenode import CPin
 from variables import oas_variablechecker
 
-# ###################################################################################
-# this module is responsible for the runtime data management (and for all other data
-# which is stored in memory)
-# ##################################################################################
-	
+
 class oas_data_handler(oas_variablechecker):
-	def oas_data_name2ID(self,mode="normal",name=""):
-		ret=""
-		for key in self.oas_rt.keys():
-			if str(self.oas_rt[key]["name"])==str(name):
-				ret=key
-		if ret=="":
-			if mode=="normal":
-				print "[Error] Problem with name2ID with name: "+str(name)
-			return 0
+	"""this module is responsible for the runtime data management (and for all other data
+	which is stored in memory)
+	"""
+	def oas_data_name2ID(self, mode="normal", name=""):
+
+		for key in self.oas_rt.iterkeys():
+			if self.oas_rt[key].name == name:
+				return key
 		else:
-			return ret
+			if mode == "normal":
+				print "[Error] Problem with name2ID with name: "+ name
+			return 0
 
 	def oas_data_ID2name(self,mode="normal",ID=""):
 		try:
-			return str(self.oas_rt[str(ID)]["name"])
+			return self.oas_rt[ID].name
 		except:
-			if mode=="normal":
-				print "[Error] Problem with ID2name with ID: "+str(ID)
+			if mode == "normal":
+				print "[Error] Problem with ID2name with ID: "+ ID
 			return 0
 
 	def oas_data_nodeInputs(self,mode="normal",ID=""):
 		try:
-			return self.oas_rt[str(ID)]["inputs"]
+			return self.oas_rt[ID].inputs_pin
 		except:
-			if mode=="normal":
-				print "[Error] Problem with nodeInputs request on ID: "+str(ID)
+			if mode == "normal":
+				print "[Error] Problem with nodeInputs request on ID: " + ID
 			return 0
 
 	def oas_data_nodeOutputs(self,mode="normal",ID=""):
 		try:
-			return self.oas_rt[str(ID)]["outputs"]
+			return self.oas_rt[ID].output_pin
 		except:
-			if mode=="normal":
-				print "[Error] Problem with nodeOutputs request on ID: "+str(ID)
+			if mode == "normal":
+				print "[Error] Problem with nodeOutputs request on ID: " + ID
 			return 0
 
-# ###########################################
-# random generator for the nodes
-# ###########################################
-
 	def generate_random_with_check(self):
-		randomized=0
-		chk=True
-		while chk==True:
-			randomized=randrange(1000,1000000)
-			chk=self.oas_rt.has_key(str("Node"+str(randomized)))
-		return randomized
-		
-# ###############################################
-# random generator for the connections
-# maybe this 2 ran generator can be solved 
-# in one function but for now, it is better
-# ###############################################
+		"""random generator for the nodes """
+		while True:
+			randomized = randrange(1000, 1000000)
+			if not str("Node"+str(randomized)) in self.oas_rt:
+				return randomized
 
 	def generate_random_with_check_for_connection(self):
-		randomized=0
-		chk=True
-		while chk==True:
-			randomized=randrange(1000,1000000)
-			chk=self.oas_rt_connections.has_key(str("Connection"+str(randomized)))
-		return randomized
+		"""random generator for the connections"""
+		while True:
+			randomized = randrange(1000, 1000000)
+			if not str("Connection"+str(randomized)) in self.oas_rt_connections:
+				return randomized
 
-# ##################################################
-# list the nodes or connections
-# if the modde is 0 it will give you back a list
-# of the sorted nodes/connections
-# ###################################################
-
-	def oas_data_list(self,mode="normal",listtype="nodetypes",searchtag=""):
-		returnvalue=[]
-		if listtype=="nodetypes":
-			for ndtps in self.oas_node_list.keys():		
-				if searchtag!="":
-					if ndtps.find(searchtag)>-1:
+	def oas_data_list(self, mode="normal", listtype="nodetypes", searchtag=""):
+		"""list the nodes or connections if the mode is normal it will give you back a list of the sorted nodes/connections
+		:param mode:
+		:param listtype:
+		:param searchtag:
+		:return nodes: list the nodes or connections
+		"""
+		returnvalue = []
+		if listtype == "nodetypes":
+			for ndtps in self.oas_node_list.iterkeys():
+				if searchtag:
+					if ndtps == searchtag:
 						returnvalue.append(ndtps)
 				else:
 					returnvalue.append(ndtps)
-		elif listtype=="scene":
-			for ndtps in self.oas_rt.keys():		
-				if searchtag!="":
-					if ndtps.find(searchtag)>-1:
-						returnvalue.append(self.oas_rt[ndtps]['name'])
+		elif listtype == "scene":
+			for ID, node in self.oas_rt.iteritems():
+				if searchtag:
+					if node.name == searchtag:
+						returnvalue.append(node.name)
 				else:
-					returnvalue.append(self.oas_rt[ndtps]['name'])			
+					returnvalue.append(node.name)
 		elif listtype == "variables":
-			for vtps in self.oas_variablecategory.keys():
+			for vtps in self.oas_variablecategory.iterkeys():
 				returnvalue.append(vtps)
-		elif listtype=="connections":
-			for cns in self.oas_rt_connections.keys():		
-				if searchtag!="":
-					if self.oas_rt[(str(self.oas_rt_connections[cns]['in_node']))]['name']==str(searchtag) or self.oas_rt[(str(self.oas_rt_connections[cns]['out_node']))]['name']==str(searchtag):
-						returnvalue.append(cns)	
+		elif listtype == "connections":
+			for cns in self.oas_rt_connections.iterkeys():
+				if searchtag:
+					in_node = self.oas_rt_connections[cns]['in_node']
+					out_node = self.oas_rt_connections[cns]['out_node']
+					if searchtag in (self.oas_rt[in_node].name, self.oas_rt[out_node].name):
+						returnvalue.append(cns)
 				else:
-						returnvalue.append(cns)		
+					returnvalue.append(cns)
 		if mode=="normal":
 			print ""
 			print "List ("+str(listtype)+"):"
@@ -120,24 +99,26 @@ class oas_data_handler(oas_variablechecker):
 				print v	
 			print ""
 		return returnvalue
-		
-# ###################################################################
-# this will show you the inputs and the outputs of the scene
-# if mode is "silent" thna doing nothing at this time maybe later...
-# ###################################################################
 
-	def oas_show_attribute_parameters(self, mode="normal",node=""):
+	def oas_show_attribute_parameters(self, mode="normal", node=""):
+		"""this will show you the inputs and the outputs of the scene if mode is "silent" than doing nothing at this time
+		:param mode:
+		:param node:
+		:return list: the inputs and the outputs
+		"""
 		global_return=[]
-		for nodes in self.oas_rt.keys():
-			if str(self.oas_rt[nodes]['name'])==str(node):
-				for ins in self.oas_rt[nodes]['inputs']:
-					con_chk=0
-					for con in self.oas_rt_connections.keys():
-						if (self.oas_rt[self.oas_rt_connections[con]['in_node']]['name']==str(node) and self.oas_rt_connections[con]['in_value']==str(ins)):
-							con_chk=1
-					re=[ins,self.oas_rt[nodes]['inputs'][ins]['variable_type'],self.oas_rt[nodes]['inputs'][ins]['value'],self.oas_rt[nodes]['inputs'][ins]['options'],str(con_chk)]
-					global_return.append(re)
-		if mode=="normal":
+		ID = self.oas_data_name2ID(mode="normal", node="")
+		node_obj = self.oas_rt.get(ID, None)
+		if node_obj:
+			for pin in node_obj.input_pin.itervalues():
+					for con in self.oas_rt_connections.iterkeys():
+						in_node = self.oas_rt_connections[con]['in_node']
+						in_value = self.oas_rt_connections[con]['in_value']
+						if self.oas_rt[in_node].name == node and in_value == pin.name:
+							global_return.append((pin.name, pin.variable_type, pin.value, pin.options, True))
+					else:
+						global_return.append((pin.name, pin.variable_type, pin.value, pin.options, False))
+		if mode == "normal":
 			print global_return
 		else:
 			return global_return
@@ -235,221 +216,204 @@ class oas_data_handler(oas_variablechecker):
 			if mode=="normal":
 				print "[Error] In show: No node named: "+str(showtype)
 			return 0
-		
-		
-# ########################################################################################
-# counts a node or a connection in the scene or in the oas_node_list
-# if the mode is "silent" it is doing nothing. (this ones are realy just for visualization)
-# ########################################################################################
 
-	def oas_data_count(self,mode="normal",counttype="nodetypes"):
-		if counttype=="nodetypes":
-			if mode=="normal":
-				print "There is "+str(len(self.oas_node_list.keys()))+" node in memory."
-			return [str(len(self.oas_node_list.keys()))]
-		elif counttype=="scene":
-			if mode=="normal":
-				print "There is "+str(len(self.oas_rt.keys()))+" node in the scene."
-			return [str(len(self.oas_rt.keys()))]
-		elif counttype=="connections":
-			if mode=="normal":
-				print "There is "+str(len(self.oas_rt_connections.keys()))+" connection."
-			return [str(len(self.oas_rt_connections.keys()))]
+	def oas_data_count(self,mode="normal", counttype="nodetypes"):
+		"""counts a node or a connection in the scene or in the oas_node_list if the mode is "silent" it is doing nothing.
+		:param mode:
+		:param counttype:
+		:return:
+		"""
+		if counttype == "nodetypes":
+			if mode == "normal":
+				print "There is " + str(len(self.oas_node_list)) + " node in memory."
+			return [str(len(self.oas_node_list))]
+		elif counttype == "scene":
+			if mode == "normal":
+				print "There is "+str(len(self.oas_rt))+" node in the scene."
+			return [str(len(self.oas_rt))]
+		elif counttype == "connections":
+			if mode == "normal":
+				print "There is "+str(len(self.oas_rt_connections))+" connection."
+			return [str(len(self.oas_rt_connections))]
 		else: 
-			if mode=="normal":
+			if mode == "normal":
 				print "[Error] In count: None-valid option given."
 			return 0			
-				
-# ##########################################################################################
-# this function creates a node with a given type
-# if mode is 0 it will create the node, but in "silent" mode
-# ##########################################################################################			
-				
-	def oas_data_create(self,mode="normal",nodetype="",posx=100,posy=100):
-		result=0
-		for nds in self.oas_node_list.keys():
-			if str(nds)==str(nodetype):
-				generated_random=0
-				generated_random=str(self.generate_random_with_check())
-				self.oas_rt["Node"+generated_random]=deepcopy(self.oas_node_list[nds])
-				self.oas_rt["Node"+generated_random]['nodetype']=str(nds)
-				self.oas_rt["Node"+generated_random]['name']=str(str(nds)+generated_random)
-				self.oas_rt["Node"+generated_random]['posx']=posx
-				self.oas_rt["Node"+generated_random]['posy']=posy
-				del self.oas_rt["Node"+generated_random]['tag']
-				del self.oas_rt["Node"+generated_random]['path']
-				del self.oas_rt["Node" + generated_random]['gen_func']
-				self.oas_last_node_created=str(str(nds)+generated_random)
-				if mode=="normal":
-					print "Node "+str(str(nds)+generated_random)+" created."
-				result=1
-				return str(str(nds)+generated_random)
-		if result==0:
-			if mode=="normal":
+
+	def oas_data_create(self, mode="normal", nodetype="", posx=100, posy=100):
+		"""this function creates a node with a given type.
+		:param mode:
+		:param nodetype:
+		:param posx:
+		:param posy:
+		:return ID:
+		"""
+		node_class = self.oas_node_list.get(nodetype, None)
+		if node_class:
+			generated_random = str(self.generate_random_with_check())
+			self.oas_rt["Node" + generated_random] = node_class(generated_random, posx, posy)
+			self.oas_last_node_created = nodetype + generated_random
+			if mode == "normal":
+				print "Node "+str(str(nodetype)+generated_random)+" created."
+			return str(str(nodetype)+generated_random)
+		else:
+			if mode == "normal":
 				print "[Error] In create: Unknown nodetype"
 			return 0
 
-	def oas_data_duplicate(self,mode="normal",node="",posx=100,posy=100):
-		result=0
-		for nds in self.oas_rt.keys():
-			if self.oas_rt[nds]["name"]==str(node):
-				generated_random=0
-				new_name=self.nameChecker(mode="silent",name=self.oas_rt[nds]["name"])
-				generated_random=str(self.generate_random_with_check())
-				self.oas_rt["Node"+generated_random]=deepcopy(self.oas_rt[nds])
-				self.oas_rt["Node"+generated_random]['name']=new_name
-				self.oas_rt["Node"+generated_random]['posx']=posx
-				self.oas_rt["Node"+generated_random]['posy']=posy
-				self.oas_last_node_created=new_name
-				if mode=="normal":
-					print "Node "+str(new_name)+" created."
-				result=1
-				return new_name
-		if result==0:
-			if mode=="normal":
+	def oas_data_duplicate(self, mode="normal", ID="", posx=100, posy=100):
+		"""
+		this function duplicate a node with a given ID.
+		:param mode:
+		:param ID:
+		:param posx:
+		:param posy:
+		:return ID:
+		"""
+		if ID in self.oas_rt:
+			old_node = self.oas_rt[ID]
+			generated_random = str(self.generate_random_with_check())
+			new_node = old_node.duplicate(generated_random, posx, posy)
+			self.oas_rt["Node"+generated_random] = new_node
+			self.oas_last_node_created = new_node.name
+			if mode == "normal":
+				print "Node "+ new_node.name + " created."
+			return new_node.name
+		else:
+			if mode == "normal":
 				print "[Error] In duplicate:Unknown nodetype"
 			return 0
 
-	def nameChecker(self,mode="normal",name=""):
+	def nameChecker(self, mode="normal", name=""):
 		nameout=name
 		for key in self.oas_rt.keys():
-			if self.oas_rt[key]["name"]==name:
+			if self.oas_rt[key].name == name:
 				n=1
 				while n==1:
-					if self.oas_rt[key]["name"]==name+str(n).zfill(3):
+					if self.oas_rt[key].name == name+str(n).zfill(3):
 						pass
 					else:
 						nameout=name+str(n).zfill(3)
 						n=2
 		return str(nameout)
-# #######################################################################################
-# this is deleting a node or connection (disconnect)
-# mode 0 is silence
-# #######################################################################################
 
-	def oas_data_delete(self,mode="normal",deletetype="node",target=""):
-		if str(deletetype)=="node":
-			nodename=""
-			for nds in self.oas_rt.keys():
-				if nds==target:
-					nodename=nds
-				elif str(self.oas_rt[nds]['name'])==str(target):
-					nodename=str(nds)
-			if self.oas_rt.has_key(nodename):
-				line_delete_list=self.oas_data_list(mode="silent",listtype="connections",searchtag=str(self.oas_rt[nodename]['name']))
-				del self.oas_rt[nodename]
-				for connss in line_delete_list:
-					x=self.oas_data_delete(mode=mode,deletetype="connection",target=str(connss))
-				if mode=="normal":
-					print "Node "+str(target)+" deleted."
-				return [nodename]
+	def oas_data_delete(self, mode="normal", deletetype="node", target=""):
+		"""
+		this is deleting a node or connection(disconnect)
+		:param mode:
+		:param deletetype:
+		:param target:
+		:return node or connection:
+		"""
+		if str(deletetype) == "node":
+			for node in self.oas_rt.values():
+				if target in (node.ID, node.name):
+					line_delete_list = self.oas_data_list(mode="silent", listtype="connections", searchtag=node.name)
+					del self.oas_rt[node.ID]
+					for con in line_delete_list:
+						self.oas_data_delete(mode=mode, deletetype="connection", target=con)
+					if mode == "normal":
+						print "Node "+str(target)+" deleted."
+					return node.name
 			else:
-				if mode=="normal":
+				if mode == "normal":
 					print "[Error] In delete: Node "+str(target)+" not found."
 				return 0
-		elif str(deletetype)=="connection":
-			if self.oas_rt_connections.has_key(str(target)):
-				del self.oas_rt_connections[str(target)]
-				if mode=="normal":
+		elif str(deletetype) == "connection":
+			if target in self.oas_rt_connections:
+				del self.oas_rt_connections[target]
+				if mode == "normal":
 					print "Connection "+str(target)+" deleted."
-				return [target]
+				return target
 			else:
-				if mode=="normal":
+				if mode == "normal":
 					print "[Error] In delete: Wrong connection name."
 				return 0
 		else:
-			if mode=="normal":
+			if mode == "normal":
 				print "[Error] In delete: Wrong type option."
 			return 0
-			
-# ##########################################################################################
-# this will set the node input value
-# ##########################################################################################			
-				
-	def oas_data_addInput(self,mode="normal",node="",variablename="",variabletype="string",defaultvalue=""):
-		return self.oas_data_addInOutput("inputs", mode, node, variablename, variabletype, defaultvalue)
+
+	def oas_data_addInput(self,mode="normal",node="",variablename="",variabletype="any",defaultvalue=""):
+		return self.oas_data_addPin("input", mode, node, variablename, variabletype, defaultvalue)
 
 	def oas_data_addOutput(self, mode="normal", node="", variablename="", variabletype="string", defaultvalue=""):
-		return self.oas_data_addInOutput("outputs", mode, node, variablename, variabletype, defaultvalue)
+		return self.oas_data_addPin("output", mode, node, variablename, variabletype, defaultvalue)
 
-	def oas_data_addInOutput(self, type="inputs", mode="normal", node="", variablename="", variabletype="string", defaultvalue=""):
+	def oas_data_addPin(self, type="input", mode="normal", node="", variablename="", variabletype="string", defaultvalue=""):
 		if node != "" and variablename != "":
 			ref_string = "qwertyuiopasdfghjklzxcvbnm1234567890_QWERTYUIOPASDFGHJKLZXCVBNM"
-			numb = "1234567890"
 			result_new_name = ""
 			for char in str(variablename):
 				if ref_string.find(char) > -1:
 					result_new_name += char
 			variablename = result_new_name
-			ID = ""
-			for id in self.oas_rt.keys():
-				if str(self.oas_rt[id]["name"]) == str(node):
-					ID = id
-			if ID == "":
+			ID = self.oas_data_name2ID("normal", variablename)
+			if not ID:
 				if mode == "normal":
-					print "[Error] In add%s: Node not existing..." % "Input" if type == "inputs" else "Output"
+					print "[Error] In add %s_pin: Node not existing..." % type
 				return 0
-			if str(variablename) in self.oas_rt[ID][type]:
+			node_obj = self.oas_rt[ID]
+			pins = getattr(node_obj, "%s_pin" % type)
+			if variablename in pins:
 				if mode == "normal":
-					print "[Error] In add%s: Attribute already exsisting." % "Input" if type == "inputs" else "Output"
+					print "[Error] In add %s_pin: Attribute already exsisting." % type
 				return 0
-			self.oas_rt[ID][type][variablename] = {'variable_type': variabletype, 'value': defaultvalue,
-													   'options': ''}
+			pin = CPin(variablename)
+			if type in ("input", "output"):
+				pin.variable_type = variabletype
+				pin.value = defaultvalue
+				pin.options = ""
+			pins[variablename] = pin
+
 			if mode == "normal":
-				print "Attribute " + str(variablename) + " was added to node " + str(node) + " !"
+				print "Attribute " + variablename + " was added to node " + node + " !"
 			return variablename
 		else:
 			if mode == "normal":
-				print "[Error] In add%s: Problematic description.." % "Input" if type == "inputs" else "Output"
+				print "[Error] In add %s_pin: Problematic description." % type
 			return 0
 
 	def oas_data_delInput(self,mode="normal",node="", variablename=""):
-		return self.oas_data_delInOutput("inputs", mode, node, variablename)
+		return self.oas_data_delPin("input", mode, node, variablename)
 
 	def oas_data_delOutput(self,mode="normal",node="", variablename=""):
-		return self.oas_data_delInOutput("outputs", mode, node, variablename)
+		return self.oas_data_delPin("output", mode, node, variablename)
 
-	def oas_data_delInOutput(self, type="inputs", mode="normal", node="", variablename=""):
-		if node != "" and variablename != "":
-			ID = ""
-			for id in self.oas_rt.keys():
-				if str(self.oas_rt[id]["name"]) == str(node):
-					ID = id
-			if ID == "":
+	def oas_data_delPin(self, type="input", mode="normal", node="", variablename=""):
+		if node and variablename:
+			ID = self.oas_data_name2ID("normal", node)
+			if not ID:
 				if mode == "normal":
-					print "[Error] In del%s: Node not existing..." % "Input" if type == "inputs" else "Output"
+					print "[Error] In del %s_pin: Node not existing..." % type
 				return 0
-			if str(variablename) in self.oas_rt[ID][type]:
-				pass
-			else:
+			node_obj = self.oas_rt[ID]
+			pins = getattr(node_obj, "%s_pin" % type)
+			if variablename not in pins:
 				if mode == "normal":
-					print "[Error] In del%s: Attribute not existing." % "Input" if type == "inputs" else "Output"
+					print "[Error] In del %s_pin: Attribute not existing." % type
 				return 0
-			nodetype = self.oas_rt[ID]["nodetype"]
-			if variablename in self.oas_node_list[nodetype][type]:
+			original_pins = getattr(node_obj.__class__,  "%s_pin" % type)
+			if variablename in original_pins:
 				if mode == "normal":
-					print "[Error] In del%s: This is an original attribute for the node, you can not delete it!" % "Input" if type == "inputs" else "Output"
+					print "[Error] In del %s_pin: This is an original attribute for the node, you can not delete it!" % type
 				return 0
-			contodelete = ""
 			for cons in self.oas_rt_connections.keys():
-				node_type = "in_node" if type == "inputs" else "out_node"
-				value_type = "in_value" if type == "inputs" else "out_value"
-				if self.oas_rt[str(self.oas_rt_connections[cons][node_type])]["name"] == str(node):
-					if str(self.oas_rt_connections[cons][value_type]) == str(variablename):
-						contodelete = cons
-			if contodelete != "":
-				cdret = self.oas_data_delete(mode=mode, deletetype="connection", target=contodelete)
-				if cdret == 0:
-					if mode == "normal":
-						print "[Error] In del%s: Problem during the conneciton deletion" % "Input" if type == "inputs" else "Output"
-					return 0
-			del self.oas_rt[ID][type][variablename]
+				node_type = "in_node" if type == "input" else "out_node"
+				value_type = "in_value" if type == "input" else "out_value"
+				if self.oas_rt[self.oas_rt_connections[cons][node_type]] == ID and \
+								self.oas_rt_connections[cons][value_type] == variablename:
+					if not self.oas_data_delete(mode=mode, deletetype="connection", target=cons):
+						if mode == "normal":
+							print "[Error] In del %s_pin: Problem during the conneciton deletion" % type
+						return 0
+			del pins[variablename]
 			if mode == "normal":
 				print "Attribute " + str(variablename) + " was deleted!"
 			return variablename
 		else:
 			if mode == "normal":
-				print "[Error] In del%s: Problematic description.." % "Input" if type == "inputs" else "Output"
+				print "[Error] In del %s_pin: Problematic description." % type
 			return 0
 
 	def oas_data_set(self,mode="normal",nodevalue="",value=""):
@@ -483,44 +447,29 @@ class oas_data_handler(oas_variablechecker):
 					print "[Error] In set: Problematic description.."
 				return 0
 
-	def oas_data_positions(self,mode="normal",nodevalue="",posx=100,posy=100):
-		if nodevalue!="" and posx!="" and posy!="":
-				nodelists={}
-				for noddd in self.oas_rt.keys():
-					nodelists[self.oas_rt[noddd]['name']]=noddd
-				if nodelists.has_key(nodevalue):
-						try:
-							self.oas_rt[nodelists[nodevalue]]['posx']=int(posx)
-							self.oas_rt[nodelists[nodevalue]]['posy']=int(posy)
-						except:
-							return 0
-						if mode=="normal":
-							pass
-							#print "New position for "+str(nodevalue)+" is: ", posx, posy 
-						return [posx,posy]
-				else:
-					if mode=="normal":
-						print "[Error] In positions: None existing node..."
-					return 0
+	def oas_data_positions(self, mode="normal", nodevalue="", posx=100, posy=100):
+		if nodevalue and posx and posy:
+			ID = self.oas_data_name2ID("normal", nodevalue)
+			if ID:
+				node = self.oas_rt[ID]
+				node.posx = int(posx)
+				node.posy = int(posy)
+				return [posx, posy]
+			else:
+				if mode=="normal":
+					print "[Error] In positions: None existing node..."
+				return 0
 
-	def oas_get_positions(self,mode="normal",nodevalue=""):
-		if nodevalue!="":
-				nodelists={}
-				x=0
-				y=0
-				for noddd in self.oas_rt.keys():
-					nodelists[self.oas_rt[noddd]['name']]=noddd
-				if nodelists.has_key(nodevalue):
-						try:
-							x=self.oas_rt[nodelists[nodevalue]]['posx']
-							y=self.oas_rt[nodelists[nodevalue]]['posy']
-						except:
-							return 0
-						return [x,y]
-				else:
-					if mode=="normal":
-						print "[Error] In getpositions: None existing node..."
-					return 0
+	def oas_get_positions(self, mode="normal", nodevalue=""):
+		if nodevalue:
+			ID = self.oas_data_name2ID("normal", nodevalue)
+			if ID:
+				node = self.oas_rt[ID]
+				return [node.posx, node.posy]
+			else:
+				if mode=="normal":
+					print "[Error] In getpositions: None existing node..."
+				return 0
 
 # ##########################################################################
 # rename a node can be normal 1 or silent 0 mode

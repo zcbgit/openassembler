@@ -24,7 +24,6 @@ from Gui.Functions.assistantFunctions import assistantFunctions
 from Gui.Functions.mainFunctions import mainFunctions
 from Gui.Menu_Shortcut.mainMenu import mainmenu
 from Gui.Timeline.timelineMain import timelineMain
-import Gui.Console.guiConsole as GuiCo
 from Core.Dbase.Dbase_init import dBase_Init
 
 import sys
@@ -48,8 +47,8 @@ class GUI_main(OASWindow,keyHandler,assistantFunctions,mainFunctions,dBase_Init,
 
 		self.inAE={}
 
-		sys.stdout = GuiCo.guiConsole(self.consoleOutArea, sys.stdout)
-		sys.stderr = GuiCo.guiConsole(self.consoleOutArea, sys.stderr, QtGui.QColor(255, 0, 0))
+		# sys.stdout = GuiCo.guiConsole(self.consoleOutArea, sys.stdout)
+		# sys.stderr = GuiCo.guiConsole(self.consoleOutArea, sys.stderr, QtGui.QColor(255, 0, 0))
 
 		self.consoleInArea.hide()
 
@@ -114,8 +113,6 @@ class GUI_main(OASWindow,keyHandler,assistantFunctions,mainFunctions,dBase_Init,
 		self.oas_graphicsView.centerOn(QtCore.QPointF(-2000,-2000))
 
 		self.timeline_start()
-
-		QtCore.QObject.connect(self.oas_nodeName, QtCore.SIGNAL("editingFinished()"),self.rename)
 
 		QtCore.QObject.connect(self.oas_new_bu, QtCore.SIGNAL("clicked()"),self.new_file)
 		QtCore.QObject.connect(self.oas_open_bu, QtCore.SIGNAL("clicked()"),self.open_file)

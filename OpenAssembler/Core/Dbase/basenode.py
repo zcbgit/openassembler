@@ -1,5 +1,6 @@
 # $Id$
 # -*- coding: utf-8 -*-
+
 import collections
 import copy
 import inspect
@@ -38,12 +39,12 @@ class CBaseNode(object):
 
 	def __init__(self, ID="", posx=100, posy=100):
 		super(CBaseNode, self).__init__()
-		self.ID = ID
+		self.ID = "Node" + ID
 		self.posx = posx
 		self.posy = posy
-		self.name = ""
 		if not hasattr(self, "node_type"):
 			self.setup()
+		self.name = self.node_type + ID
 		self.pre_pin = copy.deepcopy(self.__class__.pre_pin)
 		self.next_pin = copy.deepcopy(self.__class__.next_pin)
 		self.input_pin = copy.deepcopy(self.__class__.input_pin)
@@ -113,7 +114,7 @@ Node %(ID)s[%(node_type)s|%(tag)s]
 					elif item_name in ("pre_addable", "next_addable", "input_addable", "output_addable") and line[1] == "True":
 						setattr(cls, item_name, True)
 					elif item_name in ("pre", "next"):
-						pin_name = line[1]
+						pin_name = line[1].lstrip("\"").strip("\"")
 						pin_dict = getattr(cls, "%s_pin" % item_name)
 						if pin_name in pin_dict:
 							raise RuntimeError("Redeclared %s_pin [%s] in %s." % (item_name, pin_name, cls.__name__))
@@ -151,6 +152,14 @@ Node %(ID)s[%(node_type)s|%(tag)s]
 								pin.options = cleanarray[1]
 
 						pin_dict[pin_name] = pin
+
+	def duplicate(self, ID, posx=100, posy=100):
+		node = self.__class__(ID, posx, posy)
+		node.pre_pin = copy.deepcopy(self.pre_pin)
+		node.next_pin = copy.deepcopy(self.next_pin)
+		node.input_pin = copy.deepcopy(self.input_pin)
+		node.output_pin = copy.deepcopy(self.output_pin)
+		return node
 
 
 	@classmethod

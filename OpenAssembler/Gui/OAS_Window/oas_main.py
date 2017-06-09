@@ -342,6 +342,7 @@ class Ui_oasWindow(object):
         self.oas_verticalLayout_2 = QtGui.QVBoxLayout()
         self.oas_verticalLayout_2.setObjectName("oas_verticalLayout_2")
         self.oas_nodeName = QtGui.QLineEdit(self.oas_attribute_frame)
+        self.oas_nodeName.setReadOnly(True)
         self.oas_nodeName.setObjectName("oas_nodeName")
         self.oas_verticalLayout_2.addWidget(self.oas_nodeName)
         self.oas_horizontalLayout_4 = QtGui.QHBoxLayout()

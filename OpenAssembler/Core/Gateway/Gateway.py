@@ -24,8 +24,8 @@ class oas_gateway(oas_data_handler,oas_fileio,oas_execute):
 	def oas_create(self,mode="normal",nodetype=""):
 		return self.oas_data_create(mode=mode,nodetype=nodetype)
 
-	def oas_duplicate(self,mode="normal",node=""):
-		return self.oas_data_duplicate(mode=mode,node=node)
+	def oas_duplicate(self, mode="normal", ID=""):
+		return self.oas_data_duplicate(mode=mode, ID=ID)
 
 	def oas_delete(self,mode="normal",deletetype="node",target=""):
 		return self.oas_data_delete(mode=mode,deletetype=deletetype,target=target)
@@ -109,6 +109,9 @@ class oas_gateway(oas_data_handler,oas_fileio,oas_execute):
 
 	def oas_ID2name(self,mode="normal",ID=""):
 		return self.oas_data_ID2name(mode=mode,ID=ID)
+
+	def oas_node(self,mode="normal",ID=""):
+		return self.oas_rt[ID]
 
 	def oas_nodeSettings(self,mode="normal",node=""):
 		return self.oas_rt[self.oas_name2ID(name=node)]["settings"]

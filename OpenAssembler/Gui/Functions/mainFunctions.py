@@ -134,34 +134,25 @@ class mainFunctions(oas_gateway,attributeEditor):
 		except:
 			pass
 
-	def addNode(self,nodetype):
-		name= self.oas_create(mode="normal",nodetype=nodetype)
-		ID=self.oas_name2ID(name=name)
-		if ID==0:
-			return 0
-		ins=self.oas_nodeInputs(mode="normal",ID=ID)
-		outs=self.oas_nodeOutputs(mode="normal",ID=ID)
-		input_addable = self.oas_input_addable(mode="normal",ID=ID)
-		output_addable = self.oas_output_addable(mode="normal",ID=ID)
-		item = DN.DrawNode( ID,name,ins,outs,self.nodeDraw_inputs_collection, input_addable, output_addable)
-		item.setPos(self.last_point)
-		self.oas_positions(mode="normal",nodevalue=name,posx=self.last_point.x(),posy=self.last_point.y())
-		self.oas_scene.addItem(item)
+	def addNode(self, nodetype):
+		name = self.oas_create(mode="normal", nodetype=nodetype)
+		ID = self.oas_name2ID(name=name)
+		if ID:
+			node_data = self.oas_node("normal", ID)
+			item = DN.DrawNode(ID, self.nodeDraw_inputs_collection, node_data)
+			item.setPos(self.last_point)
+			self.oas_positions(mode="normal", nodevalue=name, posx=self.last_point.x(), posy=self.last_point.y())
+			self.oas_scene.addItem(item)
 
-	def duplicateNode(self,ID):
-		node=self.oas_ID2name(ID=ID)
-		name= self.oas_duplicate(mode="normal",node=node)
-		ID=self.oas_name2ID(name=name)
-		if ID==0:
-			return 0
-		ins=self.oas_nodeInputs(mode="normal",ID=ID)
-		outs=self.oas_nodeOutputs(mode="normal",ID=ID)
-		input_addable = self.oas_input_addable(mode="normal",ID=ID)
-		output_addable = self.oas_output_addable(mode="normal",ID=ID)
-		item = DN.DrawNode( ID,name,ins,outs,self.nodeDraw_inputs_collection, input_addable, output_addable)
-		item.setPos(self.last_point)
-		self.oas_positions(mode="normal",nodevalue=name,posx=self.last_point.x(),posy=self.last_point.y())
-		self.oas_scene.addItem(item)
+	def duplicateNode(self, ID):
+		name = self.oas_duplicate(mode="normal", node_id=ID)
+		ID = self.oas_name2ID(name=name)
+		if ID:
+			node_data = self.oas_node("normal", ID)
+			item = DN.DrawNode(ID, self.nodeDraw_inputs_collection, node_data)
+			item.setPos(self.last_point)
+			self.oas_positions(mode="normal",nodevalue=name,posx=self.last_point.x(),posy=self.last_point.y())
+			self.oas_scene.addItem(item)
 
 	def do_run(self):
 		self.oas_run(mode="normal")
@@ -258,25 +249,6 @@ class mainFunctions(oas_gateway,attributeEditor):
 			self.delete_internalNode(node)
 		self.timeline_start()
 
-	def rename(self):
-		try:
-			ID=self.inAE["ID"]
-		except:
-			return 0
-		oldname=self.oas_ID2name(ID=ID)
-		newname=str(self.oas_nodeName.text())
-		if newname.strip()=="":
-			return 0
-		ret=self.oas_rename(mode="normal",old=oldname,new=newname)
-		if ret==0:
-			self.oas_nodeName.setText(oldname)
-		else:
-			self.oas_nodeName.setText(str(ret[0]))
-			self.inAE["name"]=str(ret[0])
-			for item in self.oas_scene.items():
-				if item.backID()==ID:
-					item.renameNode(str(ret[0]))
-
 	def open_file(self):
 		currentfile = QtGui.QFileDialog.getOpenFileName(self, 'Open OpenAssembler Nerwork!','',self.tr("OpenAssembler Files (*.oas)"))
 		if currentfile=="":
@@ -296,15 +268,9 @@ class mainFunctions(oas_gateway,attributeEditor):
 		scene_nodes=self.oas_list(mode="normal",listtype="scene",searchtag="")
 		for name in scene_nodes:
 			ID=self.oas_name2ID(mode="normal",name=name)
-			ins=self.oas_nodeInputs(mode="normal",ID=ID)
-			outs=self.oas_nodeOutputs(mode="normal",ID=ID)
-			pos=self.oas_getPositions(mode="normal",node=name)
-			input_addable = self.oas_input_addable(mode="normal",ID=ID)
-			output_addable = self.oas_output_addable(mode="normal",ID=ID)
-			if pos==0:
-				pos=[-2000,-2000]
-			item = DN.DrawNode( ID,name,ins,outs,self.nodeDraw_inputs_collection, input_addable, output_addable)
-			item.setPos(QtCore.QPointF(pos[0],pos[1]))
+			node_data = self.oas_node("normal", ID)
+			item = DN.DrawNode(ID, self.nodeDraw_inputs_collection, node_data)
+			item.setPos(QtCore.QPointF(node_data.posx, node_data.posy))
 			self.oas_scene.addItem(item)
 		scene_connections=self.oas_list(mode="normal",listtype="connections",searchtag="")
 		for con in scene_connections:

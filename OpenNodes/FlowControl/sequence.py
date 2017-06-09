@@ -10,7 +10,7 @@ class CSequence(CBaseNode):
 		name sequence
 		tag flowControl
 		pre ""
-		next "Then 0"
+		next "Then0"
 		next_addable True
 	}
 '''

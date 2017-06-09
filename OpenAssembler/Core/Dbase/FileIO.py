@@ -350,10 +350,10 @@ class oas_fileio(oas_data_handler):
 	def nameChecker(self,mode="normal",name=""):
 		nameout=name
 		for key in self.oas_rt.keys():
-			if self.oas_rt[key]["name"]==name:
+			if self.oas_rt[key].name==name:
 				n=0
 				while n==0:
-					if self.oas_rt[key]["name"]==name+str(n).zfill(3):
+					if self.oas_rt[key].name==name+str(n).zfill(3):
 						pass
 					else:
 						nameout=name+str(n).zfill(3)
